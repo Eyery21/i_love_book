@@ -19,27 +19,28 @@
             </tr>
         </thead>
         <tbody>
-        {% for book in books %}
-            <tr>
-                <td>{{ book.id }}</td>
-                <td>{{ book.title }}</td>
-                <td>{{ book.author }}</td>
-                <td>{{ book.personnage }}</td>
-                <img src="{{ asset('images/ulh.png') }}" alt="Symfony!"/>
-
-                <td>{{ book.label }}</td>
-                <td>{{ book.isposseded ? 'Yes' : 'No' }}</td>
-                <td>{{ book.description }}</td>
-                <td>
-                    <a href="{{ path('app_book_show', {'id': book.id}) }}">show</a>
-                    <a href="{{ path('app_book_edit', {'id': book.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="8">no records found</td>
-            </tr>
-        {% endfor %}
+      {% for book in books %}
+    <tr>
+        <td>{{ book.id }}</td>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author }}</td>
+        <td>
+            {% if book.image %}
+                <img src="/uploads/images/{{ book.image }}" alt="Image du livre" style="max-width: 200px;">
+            {% else %}
+                <em>Pas d'image</em>
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{ path('app_book_show', {'id': book.id}) }}">show</a>
+            <a href="{{ path('app_book_edit', {'id': book.id}) }}">edit</a>
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="5">No records found</td>
+    </tr>
+{% endfor %}
         </tbody>
     </table>
 
