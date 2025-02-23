@@ -30,8 +30,7 @@ class GroupeOfCharacterCrudController extends AbstractCrudController
                 ->hideOnIndex(),
 
             DateField::new('fonded_at', 'Founded At')
-                ->setFormat('dd-MM-yyyy')
-                ->hideOnIndex(),
+                ->setFormat('dd-MM-yyyy'),
 
             ChoiceField::new('alignment', 'Alignment')
                 ->setChoices([

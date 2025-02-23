@@ -24,7 +24,7 @@ class Character
     #[ORM\Column(length: 50)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $realName = null;
 
     #[ORM\Column(length: 255, nullable: true)]

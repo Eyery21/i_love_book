@@ -60,6 +60,8 @@ class GroupeOfCharacter
 
     public function __construct()
     {
+        $this->created_at = new \DateTimeImmutable(); 
+        $this->updated_at = new \DateTime();
         $this->members = new ArrayCollection();
         $this->rival_groups = new ArrayCollection();
         $this->groupeOfCharacters = new ArrayCollection();
@@ -239,5 +241,10 @@ class GroupeOfCharacter
         $this->updated_at = $updated_at;
 
         return $this;
+    }
+
+        public function __toString(): string
+    {
+        return $this->name ?? 'Unnamed Group';
     }
 }
