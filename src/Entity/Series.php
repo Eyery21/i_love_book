@@ -25,7 +25,6 @@ class Series
     #[ORM\Column(type: 'boolean')]
     private ?bool $isOneShot = null; // true pour One-Shot, false pour Série
 
-    #[ORM\ManyToOne(targetEntity: Character::class, inversedBy: 'series')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Character $character = null; // Relation vers un personnage existant
 
