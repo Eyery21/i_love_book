@@ -2,7 +2,12 @@
 
 namespace App\Controller;
 
+
+
 use App\Entity\GroupeOfCharacter;
+use App\Entity\Character;
+
+
 use App\Form\GroupeOfCharacterType;
 use App\Repository\GroupeOfCharacterRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -43,12 +48,25 @@ final class GroupeOfCharacterController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_groupe_of_character_show', methods: ['GET'])]
-    public function show(GroupeOfCharacter $groupeOfCharacter): Response
+    public function show(GroupeOfCharacter $groupeOfCharacter, EntityManagerInterface $entityManager): Response
     {
+        // Récupérer les personnages appartenant à un groupe spécifique
+        $characterInTeam = $entityManager->createQueryBuilder()
+            ->select('c') // Sélectionne l'entité 'c' (Character)
+            ->from('App\Entity\Character', 'c') // Définit Character comme entité principale
+            ->join('c.groupeOfCharacters'
+            , 't') // Jointure entre Character et son association 'team' (doit être définie dans l'entité Character)
+            ->where('t.id = :groupeOfCharacterId') // Filtre pour n'afficher que les personnages appartenant au groupe donné
+            ->setParameter('groupeOfCharacterId', $groupeOfCharacter->getId()) // Associe la valeur du groupe à :groupeOfCharacterId
+            ->getQuery()
+            ->getResult();
+
         return $this->render('groupe_of_character/show.html.twig', [
             'groupe_of_character' => $groupeOfCharacter,
+            'characters' => $characterInTeam // Passe les personnages récupérés au template
         ]);
     }
+
 
     #[Route('/{id}/edit', name: 'app_groupe_of_character_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, GroupeOfCharacter $groupeOfCharacter, EntityManagerInterface $entityManager): Response
