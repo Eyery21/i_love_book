@@ -45,7 +45,6 @@ class BookCrudController extends AbstractCrudController
                 ->setCurrency('EUR')
                 ->setStoredAsCents(false), // Ajuste si tu utilises des centimes ou des décimales
             IntegerField::new('page_count', 'Nombre de pages'),
-            IntegerField::new('rating', 'Note (sur 5)'),
             DateTimeField::new('updatedAt', 'Dernière mise à jour')
                 ->hideOnForm(),
             AssociationField::new('series', 'Series')

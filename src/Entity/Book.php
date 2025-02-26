@@ -54,8 +54,7 @@ class Book
     #[ORM\Column(nullable: true)]
     private ?int $pageCount = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?float $rating = null;
+ 
 
     /**
      * @var Collection<int, Character>
@@ -230,17 +229,6 @@ class Book
         return $this;
     }
 
-    public function getRating(): ?float
-    {
-        return $this->rating;
-    }
-
-    public function setRating(?float $rating): static
-    {
-        $this->rating = $rating;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Character>
