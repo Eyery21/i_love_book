@@ -48,25 +48,23 @@ final class CharacterController extends AbstractController
     #[Route('/{id}', name: 'app_character_show', methods: ['GET'])]
     public function show(Character $character, EntityManagerInterface $entityManager): Response
     {
-        // Récupérer uniquement les séries où ce personnage apparaît
-        $seriesWithBooks = $entityManager->createQueryBuilder() // Crée une nouvelle instance du QueryBuilder à partir de l'EntityManager
-            ->select('s') // Sélectionne l'entité 's' (Series) comme résultat principal de la requête
-            ->from('App\Entity\Series', 's') // Définit la table (entité) principale 'Series' avec l'alias 's'
-            ->join('s.books', 'b') // Effectue une jointure entre 'Series' et son association 'books' (relation définie dans l'entité Series)
-            ->join('b.characters', 'c') // Effectue une jointure entre 'books' et son association 'characters' (relation définie dans l'entité Book)
-            ->where('c.id = :characterId') // Ajoute une condition pour filtrer uniquement les résultats où l'ID du personnage correspond à :characterId
-            ->setParameter('characterId', $character->getId()) // Associe la valeur du paramètre :characterId avec l'ID du personnage donné
-            ->getQuery() // Génère la requête à partir du QueryBuilder
-            ->getResult(); // Exécute la requête et retourne le résultat sous forme d'un tableau d'objets Series
+        $seriesWithBooks = $entityManager->createQueryBuilder() 
+            ->select('s') 
+            ->from('App\Entity\Series', 's') 
+            ->join('s.books', 'b')
+            ->join('b.characters', 'c')
+            ->where('c.id = :characterId') 
+            ->setParameter('characterId', $character->getId()) 
+            ->getQuery() 
+            ->getResult(); 
 
-        // Récupérer uniquement les one-shots où ce personnage apparaît
         $oneShotBooks = $entityManager->createQueryBuilder()
             ->select('b')
             ->from('App\Entity\Book', 'b')
             ->leftJoin('b.series', 's')
             ->join('b.characters', 'c')
             ->where('c.id = :characterId')
-            ->andWhere('s.id IS NULL') // Assurer que ce sont des one-shots
+            ->andWhere('s.id IS NULL') 
             ->setParameter('characterId', $character->getId())
             ->getQuery()
             ->getResult();

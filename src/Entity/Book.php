@@ -67,7 +67,7 @@ class Book
     #[ORM\JoinColumn(nullable: true)]
     private ?Series $series = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable:true)]
     private ?string $subtitle = null;
 
     public function __construct()
