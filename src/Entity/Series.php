@@ -25,9 +25,7 @@ class Series
     #[ORM\Column(type: 'boolean')]
     private ?bool $isOneShot = null; // true pour One-Shot, false pour Série
 
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Character $character = null; // Relation vers un personnage existant
-
+  
     #[ORM\Column(length: 600, nullable: true)]
     private ?string $description = null;
 
@@ -84,18 +82,7 @@ class Series
         return $this;
     }
 
-    public function getCharacter(): ?Character
-    {
-        return $this->character;
-    }
-
-    public function setCharacter(?Character $character): static
-    {
-        $this->character = $character;
-
-        return $this;
-    }
-
+    
     public function getDescription(): ?string
     {
         return $this->description;
