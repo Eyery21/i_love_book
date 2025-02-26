@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/groupe/of/character')]
+#[Route('/team')]
 final class GroupeOfCharacterController extends AbstractController
 {
     #[Route(name: 'app_groupe_of_character_index', methods: ['GET'])]

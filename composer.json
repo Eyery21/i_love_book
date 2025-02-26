@@ -8,16 +8,16 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "cocur/slugify": "^4.6",
-        "doctrine/doctrine-bundle": "*",
-        "doctrine/doctrine-migrations-bundle": "^3.3",
-        "doctrine/orm": "^3.3",
-        "easycorp/easyadmin-bundle": "^4.20",
-        "knplabs/knp-menu-bundle": "^3.4",
+        "doctrine/doctrine-bundle": ">=2.13.2",
+        "doctrine/doctrine-migrations-bundle": "^3.4.1",
+        "doctrine/orm": "^3.3.2",
+        "easycorp/easyadmin-bundle": "^4.24.4",
+        "knplabs/knp-menu-bundle": "^3.5",
         "symfony/asset": "7.2.*",
         "symfony/asset-mapper": "7.2.*",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
-        "symfony/flex": "^2.4",
+        "symfony/flex": "^2.4.7",
         "symfony/form": "7.2.*",
         "symfony/framework-bundle": "7.2.*",
         "symfony/runtime": "7.2.*",
@@ -27,11 +27,11 @@
         "symfony/validator": "7.2.*",
         "symfony/webpack-encore-bundle": "^2.2",
         "symfony/yaml": "7.2.*",
-        "symfonycasts/verify-email-bundle": "^1.17",
-        "twig/extra-bundle": "^3.18",
-        "twig/string-extra": "^3.18",
-        "twig/twig": "^2.12|^3.0",
-        "vich/uploader-bundle": "^2.4"
+        "symfonycasts/verify-email-bundle": "^1.17.3",
+        "twig/extra-bundle": "^3.20",
+        "twig/string-extra": "^3.20",
+        "twig/twig": "^2.12|^3.20",
+        "vich/uploader-bundle": "^2.5.1"
     },
     "config": {
         "allow-plugins": {
@@ -85,9 +85,9 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^3.7",
+        "doctrine/doctrine-fixtures-bundle": "^3.7.1",
         "symfony/debug-bundle": "7.2.*",
-        "symfony/maker-bundle": "^1.61",
+        "symfony/maker-bundle": "^1.62.1",
         "symfony/stopwatch": "7.2.*",
         "symfony/web-profiler-bundle": "7.2.*"
     }
