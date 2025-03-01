@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Book;
+use App\Form\BookCategory; 
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -13,6 +14,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FloatField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+
 use Vich\UploaderBundle\Form\Type\VichImageType;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 
@@ -47,6 +50,18 @@ class BookCrudController extends AbstractCrudController
             IntegerField::new('page_count', 'Nombre de pages'),
             DateTimeField::new('updatedAt', 'Dernière mise à jour')
                 ->hideOnForm(),
+
+            ChoiceField::new('Collection')
+                ->setChoices([
+                'DC Classique' => BookCategory::DC_CLASSIQUE->value,
+                'DC Essentiels' => BookCategory::DC_ESSENTIELS->value,
+                'DC Renaissance' => BookCategory::DC_RENAISSANCE->value,
+                'DC Rebirth' => BookCategory::DC_REBIRTH->value,
+                'DC Black Label' => BookCategory::DC_BLACK_LABEL->value,
+                ])
+                ->allowMultipleChoices(false) // Sélection unique
+                ->renderExpanded(false), // Liste déroulante simple
+
             AssociationField::new('series', 'Series')
             ->setCrudController(SeriesCrudController::class)
             ->setFormTypeOption('choice_label', 'title'), // Utilise le titre pour l'affichage

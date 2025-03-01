@@ -21,13 +21,13 @@ class Book
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 600)]
+    #[ORM\Column(length: 600, nullable:true)]
     private ?string $description = null;
 
     #[Vich\UploadableField(mapping: 'book_images', fileNameProperty: 'image')]
     private ?File $imageFile = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length:255, nullable: true)]
     private ?string $parution = null;
 
     #[ORM\Column(nullable: true)]
@@ -54,8 +54,6 @@ class Book
     #[ORM\Column(nullable: true)]
     private ?int $pageCount = null;
 
- 
-
     /**
      * @var Collection<int, Character>
      */
@@ -68,6 +66,9 @@ class Book
 
     #[ORM\Column(length: 255, nullable:true)]
     private ?string $subtitle = null;
+
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $Collection = null;
 
     public function __construct()
     {
@@ -279,5 +280,22 @@ class Book
         $this->subtitle = $subtitle;
 
         return $this;
+    }
+
+    public function getCollection(): ?string
+    {
+        return $this->Collection;
+    }
+
+    public function setCollection(?string $Collection): static
+    {
+        $this->Collection = $Collection;
+
+        return $this;
+    }
+
+    public function getDisplayName(): string
+    {
+        return $this->title . ($this->subtitle ? ' - ' . $this->subtitle : '');
     }
 }

@@ -26,10 +26,9 @@
 				<li>
 					<strong>Page Count:</strong>
 					{{ book.pagecount }}</li>
-				<li>
-					<strong>Rating:</strong>
-					{{ book.rating }}</li>
-				<li>
+				
+					<p>Collection {{ book.collection }}</p>
+				
 
 					{% if is_granted('ROLE_ADMIN') %}
 						<a href="{{ path('app_book_edit', {'id': book.id}) }}">Edit</a>

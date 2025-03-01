@@ -43,6 +43,11 @@ class CharacterCrudController extends AbstractCrudController
 
             // Champs texte étendus
             TextEditorField::new('originStory', 'Histoire d’Origine')->hideOnIndex(),
+
+            AssociationField::new('books', 'Book')
+            ->setCrudController(BookCrudController::class)
+            ->setFormTypeOption('choice_label', 'displayName'),
+
             ArrayField::new('power', 'Pouvoirs')->hideOnIndex(),
             ArrayField::new('equipement', 'Équipements')->hideOnIndex(),
 
@@ -61,6 +66,9 @@ class CharacterCrudController extends AbstractCrudController
             TextField::new('backgroundNavbarFile', 'Télécharger une image pour la barre de navigation')
                 ->setFormType(VichImageType::class)
                 ->onlyOnForms(),
+
+            
         ];
+
     }
 }

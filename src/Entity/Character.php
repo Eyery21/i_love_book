@@ -60,7 +60,7 @@ class Character
     /**
      * @var Collection<int, Book>
      */
-    #[ORM\ManyToMany(targetEntity: Book::class, mappedBy: 'personnage')]
+    #[ORM\ManyToMany(targetEntity: Book::class, mappedBy: 'characters')]
     private Collection $books;
 
     /**
@@ -258,7 +258,7 @@ class Character
     {
         if (!$this->books->contains($book)) {
             $this->books->add($book);
-            $book->addPersonnage($this);
+            $book->addCharacter($this);
         }
 
         return $this;
@@ -267,7 +267,7 @@ class Character
     public function removeBook(Book $book): static
     {
         if ($this->books->removeElement($book)) {
-            $book->removePersonnage($this);
+            $book->removeCharacter($this);
         }
 
         return $this;
