@@ -50,20 +50,18 @@ class BookCrudController extends AbstractCrudController
             IntegerField::new('page_count', 'Nombre de pages'),
             DateTimeField::new('updatedAt', 'Dernière mise à jour')
                 ->hideOnForm(),
+            AssociationField::new('collection')
+            ->setCrudController(CollectionsCrudController::class)
+            ->setLabel('Collection')
+            ->formatValue(fn($value, $entity) => $entity->getCollection() ? $entity->getCollection()->getName() : 'Aucune collection')
 
-            ChoiceField::new('Collection')
-                ->setChoices([
-                'DC Classique' => BookCategory::DC_CLASSIQUE->value,
-                'DC Essentiels' => BookCategory::DC_ESSENTIELS->value,
-                'DC Renaissance' => BookCategory::DC_RENAISSANCE->value,
-                'DC Rebirth' => BookCategory::DC_REBIRTH->value,
-                'DC Black Label' => BookCategory::DC_BLACK_LABEL->value,
-                ])
-                ->allowMultipleChoices(false) // Sélection unique
-                ->renderExpanded(false), // Liste déroulante simple
+            ->setFormTypeOption('choice_label', 'name') // Affiche le nom de la collection
+            ->setRequired(true), // Rend le champ obligatoire
 
             AssociationField::new('series', 'Series')
             ->setCrudController(SeriesCrudController::class)
+            ->formatValue(fn($value, $entity) => $entity->getSeries() ? $entity->getSeries()->getTitle() : 'Aucune collection')
+
             ->setFormTypeOption('choice_label', 'title'), // Utilise le titre pour l'affichage
 
             AssociationField::new('characters', 'Characters')

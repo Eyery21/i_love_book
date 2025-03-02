@@ -17,9 +17,12 @@ class Book
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
+    
     #[ORM\Column(length: 255)]
     private ?string $title = null;
+    
+    #[ORM\Column(length: 255, nullable:true)]
+    private ?string $subtitle = null;
 
     #[ORM\Column(length: 600, nullable:true)]
     private ?string $description = null;
@@ -64,11 +67,11 @@ class Book
     #[ORM\JoinColumn(nullable: true)]
     private ?Series $series = null;
 
-    #[ORM\Column(length: 255, nullable:true)]
-    private ?string $subtitle = null;
+   
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true)]
-    private ?string $Collection = null;
+    #[ORM\ManyToOne(targetEntity: Collections::class, inversedBy: 'books')]
+    #[ORM\JoinColumn(nullable: true, onDelete:"SET NULL")]
+    private ?Collections $collection = null;
 
     public function __construct()
     {
@@ -282,20 +285,25 @@ class Book
         return $this;
     }
 
-    public function getCollection(): ?string
+    public function getCollection(): ?Collections
     {
-        return $this->Collection;
+        return $this->collection;
     }
 
-    public function setCollection(?string $Collection): static
+    public function setCollection(?Collections $Collection): static
     {
-        $this->Collection = $Collection;
+        $this->collection = $Collection;
 
         return $this;
     }
 
+    public function __toString(): string
+    {
+        return $this->getDisplayName();
+    }
     public function getDisplayName(): string
     {
         return $this->title . ($this->subtitle ? ' - ' . $this->subtitle : '');
     }
+
 }

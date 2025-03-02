@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Collections{% endblock %}
+
+{% block body %}
+    <h1>Create new Collections</h1>
+
+    {{ include('collections/_form.html.twig') }}
+
+    <a href="{{ path('app_collections_index') }}">back to list</a>
+{% endblock %}
