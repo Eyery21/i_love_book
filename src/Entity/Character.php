@@ -63,11 +63,7 @@ class Character
     #[ORM\ManyToMany(targetEntity: Book::class, mappedBy: 'characters')]
     private Collection $books;
 
-    /**
-     * @var Collection<int, Book>
-     */
-    #[ORM\ManyToMany(targetEntity: Book::class, inversedBy: 'characters')]
-    private Collection $apparitions;
+
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
@@ -93,7 +89,6 @@ class Character
     public function __construct()
     {
         $this->books = new ArrayCollection();
-        $this->apparitions = new ArrayCollection();
         $this->groupeOfCharacters = new ArrayCollection();
     }
 
@@ -254,48 +249,11 @@ class Character
         return $this->books;
     }
 
-    public function addBook(Book $book): static
-    {
-        if (!$this->books->contains($book)) {
-            $this->books->add($book);
-            $book->addCharacter($this);
-        }
 
-        return $this;
-    }
-
-    public function removeBook(Book $book): static
-    {
-        if ($this->books->removeElement($book)) {
-            $book->removeCharacter($this);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Book>
      */
-    public function getApparitions(): Collection
-    {
-        return $this->apparitions;
-    }
-
-    public function addApparition(Book $apparition): static
-    {
-        if (!$this->apparitions->contains($apparition)) {
-            $this->apparitions->add($apparition);
-        }
-
-        return $this;
-    }
-
-    public function removeApparition(Book $apparition): static
-    {
-        $this->apparitions->removeElement($apparition);
-
-        return $this;
-    }
 
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): void
     {

@@ -1,10 +1,14 @@
 <?php
 
 namespace App\Controller;
+use App\Entity\Book;
+use App\Entity\Series;
+
 
 use App\Entity\Collections;
 use App\Form\CollectionsType;
 use App\Repository\CollectionsRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,10 +47,19 @@ final class CollectionsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_collections_show', methods: ['GET'])]
-    public function show(Collections $collection): Response
+    public function show(Collections $collections, EntityManagerInterface $entityManager): Response
     {
+        
+        $books = [];
+        $series = $collections->getSeriesList();
+        foreach ($series as $serie) {
+            $books = array_merge($books, $entityManager->getRepository(Book::class)->findBy(['series' => $serie]));
+        }
+
         return $this->render('collections/show.html.twig', [
-            'collection' => $collection,
+            'collections' => $collections,
+            'books' =>$collections->getBooks(),
+            'series' =>$collections->getSeriesList(),
         ]);
     }
 

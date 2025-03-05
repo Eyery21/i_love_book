@@ -6,6 +6,10 @@
 					<strong>Title:</strong>
 					{{ book.title }}</li>
 				<li>
+				<li>
+					<strong>sous titre:</strong>
+					{{ book.subtitle }}</li>
+				<li>
 					<strong>Description:</strong>
 					{{ book.description }}</li>
 				<li>
@@ -24,6 +28,14 @@
 					<strong>Price:</strong>
 					{{ book.price }}</li>
 				<li>
+					<li>
+						<strong>Collection:</strong>
+						<a href="{{ path('app_collections_index',{'id' : collection.id}) }}">   
+							
+							{{ book.collection ? book.collection.name : 'Aucune collection' }}
+		</a>
+
+</li>
 					<strong>Page Count:</strong>
 					{{ book.pagecount }}</li>
 				

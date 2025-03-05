@@ -73,9 +73,23 @@ class Book
     #[ORM\JoinColumn(nullable: true, onDelete:"SET NULL")]
     private ?Collections $collection = null;
 
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'book')]
+    private Collection $comments;
+
+    /**
+     * @var Collection<int, UserBook>
+     */
+    #[ORM\OneToMany(targetEntity: UserBook::class, mappedBy: 'book')]
+    private Collection $userBooks;
+
     public function __construct()
     {
         $this->characters = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->userBooks = new ArrayCollection();
     }
 
     // Getters et setters
@@ -242,24 +256,6 @@ class Book
         return $this->characters;
     }
 
-    public function addCharacter(Character $character): static
-    {
-        if (!$this->characters->contains($character)) {
-            $this->characters->add($character);
-            $character->addApparition($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCharacter(Character $character): static
-    {
-        if ($this->characters->removeElement($character)) {
-            $character->removeApparition($this);
-        }
-
-        return $this;
-    }
 
     public function getSeries(): ?Series
     {
@@ -304,6 +300,66 @@ class Book
     public function getDisplayName(): string
     {
         return $this->title . ($this->subtitle ? ' - ' . $this->subtitle : '');
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getBook() === $this) {
+                $comment->setBook(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserBook>
+     */
+    public function getUserBooks(): Collection
+    {
+        return $this->userBooks;
+    }
+
+    public function addUserBook(UserBook $userBook): static
+    {
+        if (!$this->userBooks->contains($userBook)) {
+            $this->userBooks->add($userBook);
+            $userBook->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserBook(UserBook $userBook): static
+    {
+        if ($this->userBooks->removeElement($userBook)) {
+            // set the owning side to null (unless already changed)
+            if ($userBook->getBook() === $this) {
+                $userBook->setBook(null);
+            }
+        }
+
+        return $this;
     }
 
 }

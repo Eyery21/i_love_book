@@ -47,9 +47,17 @@ class Series
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /**
+     * @var Collection<int, Collections>
+     */
+    #[ORM\ManyToMany(targetEntity: Collections::class, mappedBy: 'seriesList')]
+
+    private Collection $collectionsList;
+
     public function __construct()
     {
         $this->books = new ArrayCollection();
+        $this->collectionsList = new ArrayCollection();
     }
 
     // Getters et setters
@@ -180,6 +188,29 @@ class Series
     {
         // Retourne une représentation textuelle de l'objet
         return $this->name ?? 'Unnamed Character';
+    }
+
+    /**
+     * @return Collection<int, Collections>
+     */ public function getCollectionsList(): Collection
+    {
+        return $this->collectionsList;
+    }
+
+    public function addToCollectionsList(Collections $collection): static
+    {
+        if (!$this->collectionsList->contains($collection)) {
+            $this->collectionsList->add($collection);
+        }
+
+        return $this;
+    }
+
+    public function removeFromCollectionsList(Collections $collection): static
+    {
+        $this->collectionsList->removeElement($collection);
+
+        return $this;
     }
 
 }

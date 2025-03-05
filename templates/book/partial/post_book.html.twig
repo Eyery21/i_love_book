@@ -1,4 +1,20 @@
-<div class="book-list">
+<div class="collections-section" style="margin: 20px 0;">
+    <h3>Collections disponibles</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+        {% if collections is defined and collections|length > 0 %}
+            {% for collection in collections %}
+                <a href="{{ path('app_collections_show', {'id': collection.id}) }}" 
+                   style="display: inline-block; padding: 8px 15px; background-color: #4a6ea9; color: white; text-decoration: none; border-radius: 4px;">
+                    {{ collection.name }}
+                </a>
+            {% endfor %}
+        {% else %}
+            <p>Aucune collection disponible</p>
+        {% endif %}
+    </div>
+</div>
+  
+
 
 	{% for series in series %}
 		<ul>

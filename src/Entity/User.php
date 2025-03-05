@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -32,6 +34,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'user')]
+    private Collection $book;
+
+    /**
+     * @var Collection<int, UserBook>
+     */
+    #[ORM\OneToMany(targetEntity: UserBook::class, mappedBy: 'user')]
+    private Collection $userBooks;
+
+    public function __construct()
+    {
+        $this->book = new ArrayCollection();
+        $this->userBooks = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -104,7 +124,68 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
+        
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getBook(): Collection
+    {
+        return $this->book;
+    }
+
+    public function addBook(Comment $book): static
+    {
+        if (!$this->book->contains($book)) {
+            $this->book->add($book);
+            $book->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBook(Comment $book): static
+    {
+        if ($this->book->removeElement($book)) {
+            // set the owning side to null (unless already changed)
+            if ($book->getUser() === $this) {
+                $book->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserBook>
+     */
+    public function getUserBooks(): Collection
+    {
+        return $this->userBooks;
+    }
+
+    public function addUserBook(UserBook $userBook): static
+    {
+        if (!$this->userBooks->contains($userBook)) {
+            $this->userBooks->add($userBook);
+            $userBook->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserBook(UserBook $userBook): static
+    {
+        if ($this->userBooks->removeElement($userBook)) {
+            // set the owning side to null (unless already changed)
+            if ($userBook->getUser() === $this) {
+                $userBook->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

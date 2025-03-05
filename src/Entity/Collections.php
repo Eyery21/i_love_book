@@ -27,9 +27,17 @@ class Collections
     #[ORM\OneToMany(targetEntity: Book::class, mappedBy: 'collection')]
     private Collection $books;
 
+    /**
+     * @var Collection<int, Series>
+     */
+    #[ORM\ManyToMany(targetEntity: Series::class, inversedBy: 'collectionsList')]
+    #[ORM\JoinTable(name: 'collections_series')]
+    private Collection $seriesList;
+
     public function __construct()
     {
         $this->books = new ArrayCollection();
+        $this->seriesList = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -86,6 +94,33 @@ class Collections
             if ($book->getCollection() === $this) {
                 $book->setCollection(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Series>
+     */
+    public function getSeriesList(): Collection
+    {
+        return $this->seriesList;
+    }
+
+    public function addToSeriesList(Series $series): static
+    {
+        if (!$this->seriesList->contains($series)) {
+            $this->seriesList->add($series);
+            $series->addToCollectionsList($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFromSeriesList(Series $series): static
+    {
+        if ($this->seriesList->removeElement($series)) {
+            $series->removeFromCollectionsList($this);
         }
 
         return $this;

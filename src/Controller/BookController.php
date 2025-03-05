@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Book;
 use App\Entity\Character;
+use App\Entity\Collections;
+
+
 use App\Entity\Series;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -21,11 +24,28 @@ use Symfony\Component\Routing\Attribute\Route;
 final class BookController extends AbstractController
 {
 
-    public function getSlug(): string
+    private function getSlug(string $title, ?string $subtitle = null): string
     {
-        return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', ' ', $this->title), ' '));
+        // Combine le titre et le sous-titre (s'il existe)
+        $baseString = $title;
+        if ($subtitle) {
+            $baseString .= ' ' . $subtitle;
+        }
+
+        // Remplace les caractères spéciaux par des espaces
+        $slug = preg_replace(pattern: '/[^A-Za-z0-9-]+/', replacement: ' ', subject: $baseString);
+
+        // Remplace les espaces par des tirets
+        $slug = str_replace(search: ' ', replace: '-', subject: $slug);
+
+        // Supprime les tirets en début et fin de chaîne
+        $slug = trim(string: $slug, characters: '-');
+
+        // Convertit en minuscules
+        $slug = strtolower(string: $slug);
+
+        return $slug;
     }
-    
     #[Route( name: 'app_book_index', methods: ['GET'])]
     public function index(BookRepository $bookRepository, UserRepository $userRepository, EntityManagerInterface $entityManager): Response
     {
@@ -33,12 +53,15 @@ final class BookController extends AbstractController
         $books = $bookRepository->findAll();
         $characters = $entityManager->getRepository(Character::class)->findAll();
         $series = $entityManager->getRepository(Series::class)->findAll();
+        $collections = $entityManager->getRepository(Collections::class)->findAll(); // Ajout des collections
+
         $user = $this->getUser();
                 return $this->render('book/index.html.twig', [
             'books' => $books,
             'user' => $user,
             'characters' => $characters,
             'series' => $series,
+            'collections' => $collections, // Passez les collections à la vue
 
         ]);
     }
@@ -70,8 +93,17 @@ final class BookController extends AbstractController
 
 
     {
+        $correctSlug = $this->getSlug($book->getTitle(), $book->getSubtitle());
+        if ($slug !== $correctSlug) {
+            return $this->redirectToRoute('app_book_show', [
+                'id' => $book->getId(),
+                'slug' => $correctSlug
+            ]);
+        }
+        $collection = $book->getCollection();
         $characters = $entityManager->getRepository(Character::class)->findAll();
         $series = $book->getSeries();
+
         $otherBooks = [];
         if ($series) {
             $otherBooks = $entityManager->getRepository(Book::class)->findBy(['series' => $series]);
@@ -81,6 +113,7 @@ final class BookController extends AbstractController
             'characters' => $characters,
             'series' => $series,
             'otherBooks' => $otherBooks,
+            'collection' => $collection,
 
         ]);
     }
