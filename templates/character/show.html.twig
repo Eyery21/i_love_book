@@ -5,13 +5,13 @@
 
 {% block body %}
 	<div class="character-background text-white" style="background-image: url('/uploads/character_images/{{ character.getBackgroundPage() }}');
-																																										            width: 100%;
-																																										            min-height: 100vh;
-																																										            background-size: cover;
-																																										            background-position: center;
-																																										            background-repeat: no-repeat;
-																																										            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
-																																										            padding: 20px;">
+	width: 100%;
+	min-height: 100vh;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+	padding: 20px;">
 		<div class="container">
 			<h1 class="mb-4 text-center">Character Details</h1>
 
@@ -70,42 +70,45 @@
 			</table>
 
 			<h3 class="mt-5">Appearances</h3>
+			<h2 style="color: #3498db; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 20px;">Séries</h2>
 
-			<ul>
+			<ul style="display: flex; flex-wrap: wrap; gap: 20px; list-style-type: none; padding: 0; margin: 0;">
 				{% for series in series %}
 					{% if series.length > 1 %}
-						<h2>Séries</h2>
-						<li>
-							<strong>{{ series.title }}</strong>
+						<li style="background-color: white; border-radius: 8px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); width: 220px; display: flex; flex-direction: column; overflow: hidden; transition: transform 0.3s; margin-bottom: 20px;">
 							{% if series.image %}
-								<img src="/uploads/series_images/{{ series.image }}" alt="{{ series.title }}" style="max-width: 150px;">
+								<img src="/uploads/series_images/{{ series.image }}" alt="{{ series.title }}" style="width: 100%; height: 220px; object-fit: cover;">
 							{% else %}
-								<em>Pas d'image</em>
+								<div style="width: 100%; height: 220px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; color: #95a5a6; font-style: italic;">Pas d'image</div>
 							{% endif %}
-							<p>Série en
-								{{ series.length }}
-								tomes</p>
-							<a href="{{ path('app_series_show', {'id': series.id}) }}">Voir la série</a>
+							
+							<div style="padding: 15px; display: flex; flex-direction: column; flex-grow: 1;">
+								<strong style="font-size: 1.1rem; margin-bottom: 10px; color: #2c3e50;">{{ series.title }}</strong>
+								<p style="margin-bottom: 15px; color: #7f8c8d; font-size: 0.9rem;">Série en {{ series.length }} tomes</p>
+								<a href="{{ path('app_series_show', {'id': series.id}) }}" style="display: inline-block; background-color: #3498db; color: white; text-decoration: none; padding: 8px 15px; border-radius: 4px; text-align: center; margin-top: auto;">Voir la série</a>
+							</div>
 						</li>
 					{% endif %}
 				{% else %}
-					<li>Aucune série trouvée.</li>
+					<li style="width: 100%; padding: 20px; text-align: center; color: #95a5a6; font-style: italic;">Aucune série trouvée.</li>
 				{% endfor %}
-			</ul>
+			</ul style=" display: flex;flex-wrap:wrap; gap:20px; list-style-type:none;">
 
-			<ul>
+
+			<h2>One-Shots</h2>
+			<ul style="display: flex; flex-wrap: wrap; gap: 20px; list-style-type: none; padding: 0; margin: 0;">
 				{% for series in series %}
 					{% if series.length == 1 %}
-						<h2>One-Shots</h2>
-						<li>
-							<strong>{{ series.title }}</strong>
+						<li style="background-color: white; border-radius: 8px; width:220px; flex-direction:column; margin-bottom 20px">
 							{% if series.image %}
-								<img src="/uploads/series_images/{{ series.image }}" alt="{{ series.title }}" style="max-width: 150px;">
+								<img src="/uploads/series_images/{{ series.image }}" alt="{{ series.title }}" style="width: 100%; height: 220px; object-fit: cover;">
 							{% else %}
 								<em>Pas d'image</em>
 							{% endif %}
-							<p>récit complet</p>
-							<a href="{{ path('app_series_show', {'id': series.id}) }}">Voir le one-shot</a>
+							<div style="padding:15px; display:flex; flex-direction: column; flex-grow: 1;">
+								<strong style="font-size: 1.1rem; margin-bottom: 10px; color: #2c3e50;">{{ series.title }}</strong>
+								<p style="margin-bottom: 15px; color: #7f8c8d; font-size: 0.9rem;">récit complet</p>
+								<a href="{{ path('app_series_show', {'id': series.id}) }}" style="display: inline-block; background-color: #3498db; color: white; text-decoration: none; padding: 8px 15px; border-radius: 4px; text-align: center; margin-top: auto;">Voir le comics</a>
 						</li>
 					{% endif %}
 				{% else %}

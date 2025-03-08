@@ -1,32 +1,58 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-	{{ series.title }}
+    {{ series.title }}
 {% endblock %}
 
 {% block body %}
+    <div style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="display: flex; align-items: center; margin-bottom: 30px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px;">
+            <div style="flex: 1;">
+                <h1 style="color: #3498db; margin-bottom: 15px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">{{ series.title }}</h1>
+                <p style="margin-bottom: 15px; line-height: 1.6;">{{ series.description }}</p>
+            </div>
+            
+            <div style="margin-left: 20px;">
+                {% if series.image %}
+                    <img src="/uploads/series_images/{{ series.image }}" alt="{{ series.title }}" style="max-width: 200px; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+                {% else %}
+                    <div style="width: 200px; height: 250px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; border-radius: 5px;">
+                        <em style="color: #7f8c8d;">Pas d'image</em>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
 
-	<h2>Albums de la série</h2>
-				<td>{{ series.description }}</td>
-				<img src="/uploads/series_images/{{ series.image }}" alt="Image du livre" style="max-width: 150px;">
-	{% for book in books %}
-		<table>
+        <h2 style="color: #3498db; margin: 30px 0 20px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Albums de la série</h2>
 
-
-			<tr>
-				<h1>{{ book.title }}</h1>
-				<li>
-					<strong>SubTitle:</strong>
-					{{ book.subtitle }}</li>
-				<img src="/uploads/images/{{ book.image }}" alt="Image du livre" style="max-width: 150px;">
-				<a href="{{ path('app_book_show', { 'id': book.id, 'slug': book.title|slug }) }}">Show</a>
-
-
-			</tr>
-		{% else %}
-			<tr>
-				<td colspan="5">Aucun album trouvé pour cette série.</td>
-			</tr>
-		{% endfor %}
-	</tbody>
-</table>{% endblock %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px;">
+            {% for book in books %}
+                <div style="background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); transition: transform 0.3s, box-shadow 0.3s;">
+                    <div style="text-align: center; padding: 15px 15px 0;">
+                        {% if book.image %}
+                            <img src="/uploads/images/{{ book.image }}" alt="{{ book.title }}" style="max-width: 100%; height: 200px; object-fit: cover; border-radius: 5px;">
+                        {% else %}
+                            <div style="height: 200px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; border-radius: 5px;">
+                                <em style="color: #7f8c8d;">Pas d'image</em>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div style="padding: 15px;">
+                        <h3 style="color: #2c3e50; margin-bottom: 10px; font-size: 1.2rem;">{{ book.title }}</h3>
+                        
+                        {% if book.subtitle %}
+                            <p style="color: #7f8c8d; margin-bottom: 15px; font-size: 0.9rem;">{{ book.subtitle }}</p>
+                        {% endif %}
+                        
+                        <a href="{{ path('app_book_show', { 'id': book.id, 'slug': book.title|slug }) }}" style="display: inline-block; background-color: #3498db; color: white; text-decoration: none; padding: 8px 15px; border-radius: 4px; text-align: center; width: 100%; box-sizing: border-box;">Voir le détail</a>
+                    </div>
+                </div>
+            {% else %}
+                <div style="grid-column: 1/-1; text-align: center; padding: 30px; background-color: #f8f9fa; border-radius: 8px; color: #7f8c8d; font-style: italic;">
+                    Aucun album trouvé pour cette série.
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

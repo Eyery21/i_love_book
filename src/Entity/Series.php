@@ -54,6 +54,7 @@ class Series
 
     private Collection $collectionsList;
 
+ 
     public function __construct()
     {
         $this->books = new ArrayCollection();
@@ -197,19 +198,27 @@ class Series
         return $this->collectionsList;
     }
 
-    public function addToCollectionsList(Collections $collection): static
+    public function addCollectionsList(Collections $collection): static
     {
         if (!$this->collectionsList->contains($collection)) {
             $this->collectionsList->add($collection);
+
+            if (!$collection->getSeriesList()->contains($this)) {
+                $collection->addSeriesList($this);
+            }
+            
         }
 
         return $this;
     }
 
-    public function removeFromCollectionsList(Collections $collection): static
+    public function removeCollectionsList(Collections $collection): static
     {
-        $this->collectionsList->removeElement($collection);
-
+        if ($this->collectionsList->removeElement($collection)) {
+            if ($collection->getSeriesList()->contains($this)) {
+                $collection->removeSeriesList($this);
+            }
+        }
         return $this;
     }
 

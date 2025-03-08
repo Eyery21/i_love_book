@@ -274,7 +274,7 @@ class Book
         return $this->subtitle;
     }
 
-    public function setSubtitle(string $subtitle): static
+    public function setSubtitle(?string $subtitle): static
     {
         $this->subtitle = $subtitle;
 

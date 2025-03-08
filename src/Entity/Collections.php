@@ -34,10 +34,20 @@ class Collections
     #[ORM\JoinTable(name: 'collections_series')]
     private Collection $seriesList;
 
+
+
     public function __construct()
     {
         $this->books = new ArrayCollection();
         $this->seriesList = new ArrayCollection();
+    }
+    public function __toString(): string
+    {
+        return $this->getDisplayName();
+    }
+    public function getDisplayName(): string
+    {
+        return $this->name;
     }
 
     public function getId(): ?int
@@ -107,23 +117,22 @@ class Collections
         return $this->seriesList;
     }
 
-    public function addToSeriesList(Series $series): static
+    public function addSeriesList(Series $series): static
     {
         if (!$this->seriesList->contains($series)) {
             $this->seriesList->add($series);
-            $series->addToCollectionsList($this);
+            $series->addCollectionsList($this);
         }
 
         return $this;
     }
 
-    public function removeFromSeriesList(Series $series): static
+    public function removeSeriesList(Series $series): static
     {
         if ($this->seriesList->removeElement($series)) {
-            $series->removeFromCollectionsList($this);
+            $series->removeCollectionsList($this);
         }
 
         return $this;
     }
-
 }

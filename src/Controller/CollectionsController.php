@@ -47,22 +47,24 @@ final class CollectionsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_collections_show', methods: ['GET'])]
-    public function show(Collections $collections, EntityManagerInterface $entityManager): Response
+    public function show(Collections $collectionsList, EntityManagerInterface $entityManager): Response
     {
-        
-        $books = [];
-        $series = $collections->getSeriesList();
-        foreach ($series as $serie) {
-            $books = array_merge($books, $entityManager->getRepository(Book::class)->findBy(['series' => $serie]));
-        }
+        // Récupérer les séries de la collection
+        // $series = $collections->getSeriesList();
+
+        $series = $entityManager->getRepository(Series::class)
+            ->createQueryBuilder('s')
+            ->innerJoin('s.collectionsList', 'c')
+            ->where('c.id = :collectionId')
+            ->setParameter('collectionId', $collectionsList->getId())
+            ->getQuery()
+            ->getResult();
 
         return $this->render('collections/show.html.twig', [
-            'collections' => $collections,
-            'books' =>$collections->getBooks(),
-            'series' =>$collections->getSeriesList(),
+            'collections' => $collectionsList,
+            'series' => $series
         ]);
     }
-
     #[Route('/{id}/edit', name: 'app_collections_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Collections $collection, EntityManagerInterface $entityManager): Response
     {

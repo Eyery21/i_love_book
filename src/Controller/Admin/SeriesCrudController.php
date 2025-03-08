@@ -28,6 +28,26 @@ class SeriesCrudController extends AbstractCrudController
             BooleanField::new('isOneShot', 'Is One Shot'),
             TextareaField::new('description', 'Description')->hideOnIndex(),
             NumberField::new('length', 'Number of Volumes')->hideOnIndex(),
+            AssociationField::new('collectionsList')
+                ->setCrudController(CollectionsCrudController::class)
+                ->setLabel('Collections')
+                ->setFormTypeOptions([
+                    'choice_label' => 'name',
+                    'by_reference' => false,
+                    'multiple' => true
+                ])
+                ->formatValue(function ($value, $entity) {
+                    $collections = $entity->getCollectionsList();
+                    if ($collections && $collections->count() > 0) {
+                        // Créer une liste des noms de collections
+                        $names = [];
+                        foreach ($collections as $collection) {
+                            $names[] = $collection->getName();
+                        }
+                        return implode(', ', $names);
+                    }
+                    return 'Aucune collection';
+                }),
             ImageField::new('image', 'Series Cover')
                 ->setBasePath('/uploads/series_images')
                 ->setUploadDir('public/uploads/series_images')
@@ -38,7 +58,7 @@ class SeriesCrudController extends AbstractCrudController
             AssociationField::new('books', 'Books')
                 ->setCrudController(BookCrudController::class)
                 ->hideOnForm(),
-            
+
         ];
     }
 }

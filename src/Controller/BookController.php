@@ -5,10 +5,10 @@ namespace App\Controller;
 use App\Entity\Book;
 use App\Entity\Character;
 use App\Entity\Collections;
-
-
+use App\Entity\Comment;
 use App\Entity\Series;
 use App\Entity\User;
+use App\Form\CommentType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 use App\Repository\UserRepository;
@@ -89,9 +89,6 @@ final class BookController extends AbstractController
 
     #[Route('/{id}/{slug}', name: 'app_book_show', methods: ['GET'])]
     public function show(Book $book, string $slug, EntityManagerInterface $entityManager): Response
-    
-
-
     {
         $correctSlug = $this->getSlug($book->getTitle(), $book->getSubtitle());
         if ($slug !== $correctSlug) {
@@ -104,6 +101,21 @@ final class BookController extends AbstractController
         $characters = $entityManager->getRepository(Character::class)->findAll();
         $series = $book->getSeries();
 
+        $comment = new Comment();
+        $comment->setBook($book);
+        $comment->setCreatedAt(new \DateTime());
+        $comment->setUser($this->getUser());
+
+        
+        if ($this->getUser()) {
+            $comment->setUser($this->getUser());
+        }
+        $comment->setCreatedAt(new \DateTime());
+
+        $commentForm = $this->createForm(CommentType::class,$comment, [
+            'action' => $this->generateUrl('app_book_add_comment',['id' =>$book->getId()])
+        ]);
+
         $otherBooks = [];
         if ($series) {
             $otherBooks = $entityManager->getRepository(Book::class)->findBy(['series' => $series]);
@@ -114,7 +126,45 @@ final class BookController extends AbstractController
             'series' => $series,
             'otherBooks' => $otherBooks,
             'collection' => $collection,
+            'commentForm' => $commentForm->createView(),
 
+
+        ]);
+    }
+
+    #[Route('/{id}/comment/add', name: 'app_book_add_comment', methods: ['POST'])]
+    public function addComment(
+        Book $book,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $comment = new Comment();
+        $comment->setBook($book);
+        $comment->setCreatedAt(new \DateTime());
+
+        // Vérifier si l'utilisateur est connecté
+        if (!$this->getUser()) {
+            $this->addFlash('error', 'Vous devez être connecté pour ajouter un commentaire.');
+            return $this->redirectToRoute('app_book_show', ['id' => $book->getId(), 'slug' => $this->getSlug($book->getTitle(), $book->getSubtitle())]);
+        }
+
+        $comment->setUser($this->getUser());
+
+        $form = $this->createForm(CommentType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($comment);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre commentaire a été ajouté avec succès.');
+        } else {
+            $this->addFlash('error', 'Une erreur est survenue lors de l\'ajout de votre commentaire.');
+        }
+
+        return $this->redirectToRoute('app_book_show', [
+            'id' => $book->getId(),
+            'slug' => $this->getSlug($book->getTitle(), $book->getSubtitle())
         ]);
     }
 

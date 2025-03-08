@@ -1,94 +1,175 @@
-<div class="book-list">
-	<div class="book-item" style="display: flex; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
-		<div class="book-details" style="flex: 1;">
-			<ul style="list-style: none; padding: 0;">
-				<li>
-					<strong>Title:</strong>
-					{{ book.title }}</li>
-				<li>
-				<li>
-					<strong>sous titre:</strong>
-					{{ book.subtitle }}</li>
-				<li>
-					<strong>Description:</strong>
-					{{ book.description }}</li>
-				<li>
-					<strong>Parution:</strong>
-					{{ book.parution }}</li>
-				<li>
-					<strong>Posseded:</strong>
-					{{ book.posseded ? 'Yes' : 'No' }}</li>
-				<li>
-					<strong>Author:</strong>
-					{{ book.author }}</li>
-				<li>
-					<strong>Illustrator:</strong>
-					{{ book.illustrator }}</li>
-				<li>
-					<strong>Price:</strong>
-					{{ book.price }}</li>
-				<li>
-					<li>
-						<strong>Collection:</strong>
-						<a href="{{ path('app_collections_index',{'id' : collection.id}) }}">   
-							
-							{{ book.collection ? book.collection.name : 'Aucune collection' }}
-		</a>
-
-</li>
-					<strong>Page Count:</strong>
-					{{ book.pagecount }}</li>
-				
-				
-
-					{% if is_granted('ROLE_ADMIN') %}
-						<a href="{{ path('app_book_edit', {'id': book.id}) }}">Edit</a>
-					{% endif %}
-				</li>
-				{% for character in book.characters %}
-					<li class="list-group-item d-flex align-items-center">
-						<img src="/uploads/character_images/{{ character.getBackgroundNavBar }}" alt="{{ character.name }}" class="img-thumbnail me-3" style="width: 50px; height: 50px; object-fit: cover;">
-						<a href="{{ path('app_character_show', {'id': character.id}) }}" class="text-decoration-none">
-							{{ character.name }}
-							({{ character.realName }})
-						</a>
-					</li>
-				{% else %}
-					<li class="list-group-item">No characters associated with this book.</li>
-				{% endfor %}
-			</ul>
-		</div>
-		<div class="book-image" style="margin-left: 20px;">
-			{% if book.image %}
-				<img src="/uploads/images/{{ book.image }}" alt="Image du livre" style="max-width: 150px;">
-			{% else %}
-				<em>Pas d'image</em>
-			{% endif %}
-		</div>
-	</div>
-	<p>
-		{% if is_granted('ROLE_ADMIN') %}
-			<a href="{{ path('app_book_new') }}">Create new</a>
-		{% endif %}
-	</p>
-
-	{% if otherBooks|length > 1 %}
-		<ul class="machin" style="">
-			{% for otherBook in otherBooks %}
-				{% if otherBook.id != book.id %}
-					<li>
-						<a href="{{ path('app_book_show', { 'id': otherBook.id, 'slug': otherBook.title|slug }) }}">
-							{% if otherBook.image %}
-								<img src="/uploads/images/{{ otherBook.image }}" alt="{{ otherBook.title }}" style="max-width: 100%;">
-							{% else %}
-								<em>Pas d'image</em>
-							{% endif %}
-							show
-						</a>
-					</li>
-				{% endif %}
-			{% endfor %}
-		</ul>
-	{% else %}
-		<p>Aucun autre album dans cette série.</p>
-	{% endif %}
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <!-- Détails du livre -->
+    <div style="display: flex; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px; margin-bottom: 30px;">
+        <div style="flex: 1;">
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="color: #3498db; display: inline-block; width: 120px;">Titre:</strong>
+                    {{ book.title }}
+                </li>
+                <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="color: #3498db; display: inline-block; width: 120px;">Sous-titre:</strong>
+                    {{ book.subtitle }}
+                </li>
+                <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="color: #3498db; display: inline-block; width: 120px;">Description:</strong>
+                    {{ book.description }}
+                </li>
+                <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="color: #3498db; display: inline-block; width: 120px;">Parution:</strong>
+                    {{ book.parution }}
+                </li>
+                <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="color: #3498db; display: inline-block; width: 120px;">Possédé:</strong>
+                    {{ book.posseded ? 'Oui' : 'Non' }}
+                </li>
+                <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="color: #3498db; display: inline-block; width: 120px;">Auteur:</strong>
+                    {{ book.author }}
+                </li>
+                <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="color: #3498db; display: inline-block; width: 120px;">Illustrateur:</strong>
+                    {{ book.illustrator }}
+                </li>
+                <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="color: #3498db; display: inline-block; width: 120px;">Prix:</strong>
+                    {{ book.price }}
+                </li>
+                <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="color: #3498db; display: inline-block; width: 120px;">Collection:</strong>
+                    <a href="{{ path('app_collections_index',{'id' : collection.id}) }}" style="color: #3498db; text-decoration: none;">
+                        {{ book.collection ? book.collection.name : 'Aucune collection' }}
+                    </a>
+                </li>
+                <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="color: #3498db; display: inline-block; width: 120px;">Pages:</strong>
+                    {{ book.pagecount }}
+                </li>
+                
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li style="margin-top: 15px;">
+                        <a href="{{ path('app_book_edit', {'id': book.id}) }}" style="display: inline-block; padding: 8px 15px; background-color: #3498db; color: white; text-decoration: none; border-radius: 4px;">Modifier</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        <div style="margin-left: 30px; display: flex; align-items: center; justify-content: center;">
+            {% if book.image %}
+                <img src="/uploads/images/{{ book.image }}" alt="{{ book.title }}" style="max-width: 200px; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            {% else %}
+                <div style="width: 200px; height: 300px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; border-radius: 5px;">
+                    <em style="color: #7f8c8d;">Pas d'image</em>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Section personnages -->
+    <div style="margin-bottom: 30px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px;">
+        <h3 style="color: #3498db; margin-bottom: 20px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Personnages</h3>
+        
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            {% for character in book.characters %}
+                <li style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0;">
+                    <img src="/uploads/character_images/{{ character.getBackgroundNavBar }}" alt="{{ character.name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 30px; margin-right: 15px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                    <div>
+                        <a href="{{ path('app_character_show', {'id': character.id}) }}" style="color: #2c3e50; text-decoration: none; font-weight: 600; font-size: 1.1rem;">
+                            {{ character.name }}
+                        </a>
+                        <div style="color: #7f8c8d; font-size: 0.9rem;">({{ character.realName }})</div>
+                    </div>
+                </li>
+            {% else %}
+                <li style="padding: 20px; text-align: center; background-color: #f8f9fa; border-radius: 5px; color: #7f8c8d; font-style: italic;">
+                    Aucun personnage associé à ce livre.
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <!-- Section commentaires -->
+    <div style="margin-bottom: 30px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px;">
+        <h3 style="color: #3498db; margin-bottom: 20px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Commentaires</h3>
+        
+        {% if book.comments is defined and book.comments|length > 0 %}
+            <div style="margin-bottom: 20px;">
+                {% for comment in book.comments %}
+                    <div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <strong style="color: #2c3e50;">{{ comment.user.username ?? 'Utilisateur anonyme' }}</strong>
+                            <span style="color: #7f8c8d; font-size: 0.9rem;">{{ comment.createdAt|date('d/m/Y à H:i') }}</span>
+                        </div>
+                        <div style="line-height: 1.5;">
+                            {{ comment.content|nl2br }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 5px; color: #7f8c8d; font-style: italic;">
+                Aucun commentaire pour ce livre.
+            </p>
+        {% endif %}
+        
+        {% if app.user %}
+            <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
+                <h4 style="color: #3498db; margin-bottom: 15px;">Ajouter un commentaire</h4>
+                {{ form_start(commentForm) }}
+                    {{ form_row(commentForm.content) }}
+                    <button type="submit" style="background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: 500; margin-top: 10px;">
+                        Publier mon commentaire
+                    </button>
+                {{ form_end(commentForm) }}
+            </div>
+        {% else %}
+            <div style="margin-top: 20px; padding: 20px; background-color: #f8f9fa; border-radius: 5px; text-align: center;">
+                <p>
+                    <a href="{{ path('app_login') }}" style="color: #3498db; text-decoration: none; font-weight: 500;">
+                        Connectez-vous
+                    </a> 
+                    pour laisser un commentaire.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Section livres similaires -->
+    {% if otherBooks|length > 1 %}
+        <div style="margin-bottom: 30px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px;">
+            <h3 style="color: #3498db; margin-bottom: 20px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Autres livres de la série</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px;">
+                {% for otherBook in otherBooks %}
+                    {% if otherBook.id != book.id %}
+                        <a href="{{ path('app_book_show', { 'id': otherBook.id, 'slug': otherBook.title|slug }) }}" style="text-decoration: none; color: inherit;">
+                            <div style="text-align: center; transition: transform 0.3s;">
+                                {% if otherBook.image %}
+                                    <img src="/uploads/images/{{ otherBook.image }}" alt="{{ otherBook.title }}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); margin-bottom: 10px;">
+                                {% else %}
+                                    <div style="height: 250px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; border-radius: 5px; margin-bottom: 10px;">
+                                        <em style="color: #7f8c8d;">Pas d'image</em>
+                                    </div>
+                                {% endif %}
+                                <span style="display: block; font-weight: 500; color: #2c3e50;">{{ otherBook.title }}</span>
+                            </div>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <p style="text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 8px; color: #7f8c8d; font-style: italic; margin-bottom: 30px;">
+            Aucun autre album dans cette série.
+        </p>
+    {% endif %}
+    
+    <!-- Actions admin -->
+    {% if is_granted('ROLE_ADMIN') %}
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ path('app_book_new') }}" style="display: inline-block; padding: 10px 20px; background-color: #2ecc71; color: white; text-decoration: none; border-radius: 4px; font-weight: 500;">
+                Créer un nouveau livre
+            </a>
+        </div>
+    {% endif %}
+</div>

@@ -3,16 +3,14 @@
     <ul style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 20px; padding: 0; list-style: none;">
         {% for character in characters %}
             <li class="list-group-item d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 8px; background-color: #f9f9f9;">
-                <img 
-                    src="/uploads/character_images/{{ character.getBackgroundNavBar }}" 
-                    alt="{{ character.name }}" 
-                    class="img-thumbnail" 
-                    style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                
 
                 <div>
                     <a href="{{ path('app_character_show', {'id': character.id}) }}" class="text-decoration-none" style="font-weight: bold;">
-                        {{ character.name }} 
-                    </a>
+                    <img 
+                    src="/uploads/character_images/{{ character.getBackgroundNavBar }}" 
+                    class="img-thumbnail" 
+                    style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">                    </a>
                 </div>
             </li>
         {% else %}

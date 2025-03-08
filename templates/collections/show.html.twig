@@ -86,34 +86,36 @@
             <p>{{ collections.description }}</p>
         </div>
 
-        <h2>Livres de cette collection</h2>
-        {% if books is not empty %}
-            <ul class="books-list">
-                {% for book in books %}
-                    <li class="book-item">
-                        <a href="{{ path('app_book_show', { 'id': book.id, 'slug': book.title|slug }) }}" class="book-link">
-                            <div class="book-img">
-                                {% if book.image %}
-                                    <img src="/uploads/images/{{ book.image }}" alt="{{ book.title }}">
-                                {% else %}
+    <h2 style="color: #3498db; margin: 30px 0 20px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Séries de cette collection</h2>
+
+ {% if series|length > 0 %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px;">
+                {% for serie in series %}
+                    <div style="background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); transition: transform 0.3s, box-shadow 0.3s; text-align: center; padding-bottom: 15px;">
+                        <h4 style="padding: 15px; margin: 0; color: #2c3e50;">{{ serie.title }}</h4>
+                        
+                        <a href="{{ path('app_series_show', {'id': serie.id}) }}" style="display: block; text-decoration: none;">
+                            {% if serie.image %}
+                                <img src="/uploads/series_images/{{ serie.image }}" alt="{{ serie.title }}" 
+                                     style="width: 150px; height: 150px; object-fit: cover; border-radius: 5px; margin: 0 auto 15px; display: block; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+                            {% else %}
+                                <div style="width: 150px; height: 150px; background-color: #f0f0f0; border-radius: 5px; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; color: #7f8c8d;">
                                     <em>Pas d'image</em>
-                                {% endif %}
-                            </div>
-                            <div class="book-info">
-                                <div class="book-title">{{ book.title }}</div>
-                                {% if book.subtitle %}
-                                    <div class="book-subtitle">{{ book.subtitle }}</div>
-                                {% endif %}
-                                {% if book.author %}
-                                    <div class="book-author">{{ book.author }}</div>
-                                {% endif %}
-                            </div>
+                                </div>
+                            {% endif %}
                         </a>
-                    </li>
+                        
+                        <a href="{{ path('app_series_show', {'id': serie.id}) }}"
+                           style="display: inline-block; padding: 8px 15px; background-color: #3498db; color: white; text-decoration: none; border-radius: 4px; transition: background-color 0.3s; margin-top: 10px;">
+                            Voir la série
+                        </a>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
         {% else %}
-            <p>Aucun livre trouvé directement dans cette collection.</p>
+            <p style="text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 5px; color: #7f8c8d; font-style: italic;">
+                Aucune série dans cette collection.
+            </p>
         {% endif %}
 
         <div class="actions">
