@@ -74,7 +74,8 @@
 
 			<ul style="display: flex; flex-wrap: wrap; gap: 20px; list-style-type: none; padding: 0; margin: 0;">
 				{% for series in series %}
-					{% if series.length > 1 %}
+
+				{% if series is not empty %}
 						<li style="background-color: white; border-radius: 8px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); width: 220px; display: flex; flex-direction: column; overflow: hidden; transition: transform 0.3s; margin-bottom: 20px;">
 							{% if series.image %}
 								<img src="/uploads/series_images/{{ series.image }}" alt="{{ series.title }}" style="width: 100%; height: 220px; object-fit: cover;">

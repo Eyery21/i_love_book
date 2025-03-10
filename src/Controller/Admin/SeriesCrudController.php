@@ -59,6 +59,33 @@ class SeriesCrudController extends AbstractCrudController
                 ->setCrudController(BookCrudController::class)
                 ->hideOnForm(),
 
+            AssociationField::new('previousSeries')
+                ->setCrudController(SeriesCrudController::class)
+                ->setLabel('Série précédente')
+                ->setFormTypeOptions([
+                    'choice_label' => 'title'
+                ]),
+
+            // Ce champ doit être visible uniquement en mode détail (pas en édition)
+            // car on ne peut pas éditer directement la collection de nextSeries
+            AssociationField::new('nextSeries')
+                ->setCrudController(SeriesCrudController::class)
+                ->setLabel('Séries suivantes')
+                ->onlyOnDetail()
+                ->formatValue(function ($value, $entity) {
+                    $nextSeries = $entity->getNextSeries();
+                    if ($nextSeries->count() === 0) {
+                        return 'Aucune';
+                    }
+
+                    $titles = [];
+                    foreach ($nextSeries as $series) {
+                        $titles[] = $series->getTitle();
+                    }
+
+                    return implode(', ', $titles);
+                })
+
         ];
     }
 }

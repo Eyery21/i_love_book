@@ -31,6 +31,7 @@ class CharacterCrudController extends AbstractCrudController
             TextField::new('alias', 'Alias')->hideOnIndex(),
             TextField::new('alignment', 'Alignement')->hideOnIndex(),
             TextField::new('espece', 'Espèce')->hideOnIndex(),
+            TextField::new('multivers', 'Terre')->hideOnIndex(),
             TextField::new('baseOfOperations', 'Base d’Opérations')->hideOnIndex(),
             TextField::new('nemesys', 'Némésis')->hideOnIndex(),
             TextField::new('occupation', 'Occupation')->hideOnIndex(),

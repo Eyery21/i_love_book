@@ -48,33 +48,35 @@ final class CharacterController extends AbstractController
     #[Route('/{id}', name: 'app_character_show', methods: ['GET'])]
     public function show(Character $character, EntityManagerInterface $entityManager): Response
     {
-        $seriesWithBooks = $entityManager->createQueryBuilder() 
-            ->select('s') 
-            ->from('App\Entity\Series', 's') 
-            ->join('s.books', 'b')
-            ->join('b.characters', 'c')
-            ->where('c.id = :characterId') 
-            ->setParameter('characterId', $character->getId()) 
-            ->getQuery() 
-            ->getResult(); 
+        // Récupérer les IDs des séries
+        $seriesIds = $entityManager->getConnection()->executeQuery(
+            'SELECT DISTINCT s.id FROM series s
+         INNER JOIN book b ON b.series_id = s.id
+         INNER JOIN book_character bc ON bc.book_id = b.id
+         WHERE bc.character_id = :characterId',
+            ['characterId' => $character->getId()]
+        )->fetchFirstColumn();
+        dump(vars: $seriesIds); // Vérifiez ce que contient cette variable
 
-        $oneShotBooks = $entityManager->createQueryBuilder()
-            ->select('b')
-            ->from('App\Entity\Book', 'b')
-            ->leftJoin('b.series', 's')
-            ->join('b.characters', 'c')
-            ->where('c.id = :characterId')
-            ->andWhere('s.id IS NULL') 
-            ->setParameter('characterId', $character->getId())
-            ->getQuery()
-            ->getResult();
-    
+        // Récupérer les objets Series complets à partir des IDs
+        $series = $entityManager->getRepository(Series::class)->findBy(['id' => $seriesIds]);
 
-        dump($seriesWithBooks, $oneShotBooks);
+        // Récupérer les IDs des one-shots
+        $oneShotIds = $entityManager->getConnection()->executeQuery(
+            'SELECT b.id FROM book b
+         INNER JOIN book_character bc ON bc.book_id = b.id
+         WHERE bc.character_id = :characterId
+         AND b.series_id IS NULL',
+            ['characterId' => $character->getId()]
+        )->fetchFirstColumn();
+
+        // Récupérer les objets Book complets à partir des IDs
+        $oneShots = $entityManager->getRepository(Book::class)->findBy(['id' => $oneShotIds]);
+
         return $this->render('character/show.html.twig', [
             'character' => $character,
-            'series' => $seriesWithBooks,
-            'oneShot' => $oneShotBooks,
+            'series' => $series,
+            'oneShots' => $oneShots,
         ]);
     }
     

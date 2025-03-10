@@ -3,9 +3,13 @@
 {% block title %}Book{% endblock %}
 
 {% block body %}
-    <h1>Book</h1>
 
     {{ include('book/partial/post_book_show.html.twig')}}
+    {{ include('book/partial/post_book_charachters.html.twig')}}
+    {{ include('book/partial/post_book_comment.html.twig')}}
+    {{ include('book/partial/post_book_inseries.html.twig')}}
+    {{ include('book/partial/post_book_continuity.html.twig')}}
+
 
     <a href="{{ path('app_book_index') }}">back to list</a>
 

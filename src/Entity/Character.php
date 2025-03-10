@@ -85,6 +85,9 @@ class Character
      */
     #[ORM\ManyToMany(targetEntity: GroupeOfCharacter::class, mappedBy: 'members')]
     private Collection $groupeOfCharacters;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $multivers = null;
     
     public function __construct()
     {
@@ -248,7 +251,28 @@ class Character
     {
         return $this->books;
     }
+    public function addBook(Book $book): self
+    {
+        if (!$this->books->contains($book)) {
+            $this->books->add($book);
+            // S'assurer que la relation inverse est maintenue
+            if (!$book->getCharacters()->contains($this)) {
+                $book->addCharacter($this);
+            }
+        }
+        return $this;
+    }
 
+    public function removeBook(Book $book): self
+    {
+        if ($this->books->removeElement($book)) {
+            // S'assurer que la relation inverse est maintenue
+            if ($book->getCharacters()->contains($this)) {
+                $book->removeCharacter($this);
+            }
+        }
+        return $this;
+    }
 
 
     /**
@@ -352,6 +376,18 @@ class Character
         if ($this->groupeOfCharacters->removeElement($groupeOfCharacter)) {
             $groupeOfCharacter->removeMember($this);
         }
+
+        return $this;
+    }
+
+    public function getMultivers(): ?string
+    {
+        return $this->multivers;
+    }
+
+    public function setMultivers(?string $multivers): static
+    {
+        $this->multivers = $multivers;
 
         return $this;
     }

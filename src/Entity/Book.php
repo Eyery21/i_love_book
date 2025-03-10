@@ -256,6 +256,29 @@ class Book
         return $this->characters;
     }
 
+    public function addCharacter(Character $character): self
+    {
+        if (!$this->characters->contains($character)) {
+            $this->characters->add($character);
+            // S'assurer que la relation inverse est maintenue
+            if (!$character->getBooks()->contains($this)) {
+                $character->addBook($this);
+            }
+        }
+
+        return $this;
+    }
+    public function removeCharacter(Character $character): self
+    {
+        if ($this->characters->removeElement($character)) {
+            // S'assurer que la relation inverse est maintenue
+            if ($character->getBooks()->contains($this)) {
+                $character->removeBook($this);
+            }
+        }
+
+        return $this;
+    }
 
     public function getSeries(): ?Series
     {

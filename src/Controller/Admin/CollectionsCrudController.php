@@ -31,6 +31,8 @@ class CollectionsCrudController extends AbstractCrudController
                     'DC Renaissance' => BookCategory::DC_RENAISSANCE->value,
                     'DC Rebirth' => BookCategory::DC_REBIRTH->value,
                     'DC Black Label' => BookCategory::DC_BLACK_LABEL->value,
+                    'DC Deluxe' => BookCategory::DC_DELUXE->value,
+                    'DC Nemesis' => BookCategory::DC_NEMESIS->value,
                 ])
                 ->allowMultipleChoices(false) // Une seule valeur possible
                 ->renderExpanded(false), // Menu déroulant

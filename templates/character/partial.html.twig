@@ -1,8 +1,8 @@
 <div class="character-section">
     <h2>Characters</h2>
-    <ul style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 20px; padding: 0; list-style: none;">
+    <ul style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 5px; padding: 0; list-style: none;">
         {% for character in characters %}
-            <li class="list-group-item d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 8px; background-color: #f9f9f9;">
+            <li class="list-group-item d-flex align-items-center" style="display: flex; align-items: center; gap: 5px; border: 1px solid #ddd; border-radius: 2px; background-color: #f9f9f9;">
                 
 
                 <div>
@@ -10,7 +10,7 @@
                     <img 
                     src="/uploads/character_images/{{ character.getBackgroundNavBar }}" 
                     class="img-thumbnail" 
-                    style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">                    </a>
+                    style="width: 80px; height: 80px; object-fit: cover; border-radius: 2px;">                    </a>
                 </div>
             </li>
         {% else %}

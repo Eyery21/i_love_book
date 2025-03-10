@@ -54,11 +54,29 @@ class Series
 
     private Collection $collectionsList;
 
+
+    /**
+     * @var Series|null
+     * (prequel)
+     */
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'nextSeries')]
+    #[ORM\JoinColumn(name: 'previous_series_id', referencedColumnName: 'id', nullable: true)]
+
+    private ?self $previousSeries = null;
+
+    /**
+     * @var Collection<int, self>
+     * suite
+     */
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'previousSeries')]
+    private Collection $nextSeries;
+
  
     public function __construct()
     {
         $this->books = new ArrayCollection();
         $this->collectionsList = new ArrayCollection();
+        $this->nextSeries = new ArrayCollection();
     }
 
     // Getters et setters
@@ -188,7 +206,7 @@ class Series
     public function __toString(): string
     {
         // Retourne une représentation textuelle de l'objet
-        return $this->name ?? 'Unnamed Character';
+        return $this->title ?? 'Série sans titre';
     }
 
     /**
@@ -221,5 +239,48 @@ class Series
         }
         return $this;
     }
+
+    public function getPreviousSeries(): ?self
+    {
+        return $this->previousSeries;
+    }
+
+    public function setPreviousSeries(?self $previousSeries): static
+    {
+        $this->previousSeries = $previousSeries;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getNextSeries(): Collection
+    {
+        return $this->nextSeries;
+    }
+
+    public function addNextSeries(self $nextSeries): static
+    {
+        if (!$this->nextSeries->contains($nextSeries)) {
+            $this->nextSeries->add($nextSeries);
+            $nextSeries->setPreviousSeries($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNextSeries(self $nextSeries): static
+    {
+        if ($this->nextSeries->removeElement($nextSeries)) {
+            // set the owning side to null (unless already changed)
+            if ($nextSeries->getPreviousSeries() === $this) {
+                $nextSeries->setPreviousSeries(null);
+            }
+        }
+
+        return $this;
+    }
+
 
 }

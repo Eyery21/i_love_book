@@ -101,6 +101,14 @@ final class BookController extends AbstractController
         $characters = $entityManager->getRepository(Character::class)->findAll();
         $series = $book->getSeries();
 
+        $previousSeries = null;
+        $nextSeries = [];
+
+        if ($series) {
+            $previousSeries = $series->getPreviousSeries();
+            $nextSeries = $series->getNextSeries();
+        }
+
         $comment = new Comment();
         $comment->setBook($book);
         $comment->setCreatedAt(new \DateTime());
@@ -127,7 +135,8 @@ final class BookController extends AbstractController
             'otherBooks' => $otherBooks,
             'collection' => $collection,
             'commentForm' => $commentForm->createView(),
-
+            'previousSeries' => $previousSeries,
+            'nextSeries' => $nextSeries,
 
         ]);
     }
