@@ -46,6 +46,27 @@
                     {{ book.pagecount }}
                 </li>
                 
+                {% if app.user %}
+                    <div class="user-actions mt-4">
+                        <h4>Ajoutez à votre collection</h4>
+                        <div class="btn-group mb-3">
+                            <a href="{{ path('app_profile_add_book', {'id': book.id, 'action': 'own'}) }}" class="btn btn-sm btn-outline-success">Je possède</a>
+                            <a href="{{ path('app_profile_add_book', {'id': book.id, 'action': 'wishlist'}) }}" class="btn btn-sm btn-outline-primary">Liste de souhaits</a>
+                            <a href="{{ path('app_profile_add_book', {'id': book.id, 'action': 'read'}) }}" class="btn btn-sm btn-outline-info">Lu</a>
+                        </div>
+                        
+                        <div class="rating">
+                            <h5>Noter ce livre</h5>
+                            <div class="btn-group">
+                                {% for i in 1..5 %}
+                                    <a href="{{ path('app_profile_add_book', {'id': book.id, 'action': 'rate', 'rating': i}) }}" 
+                                    class="btn btn-sm btn-outline-warning">{{ i }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
                 {% if is_granted('ROLE_ADMIN') %}
                     <li style="margin-top: 15px;">
                         <a href="{{ path('app_book_edit', {'id': book.id}) }}" style="display: inline-block; padding: 8px 15px; background-color: #3498db; color: white; text-decoration: none; border-radius: 4px;">Modifier</a>

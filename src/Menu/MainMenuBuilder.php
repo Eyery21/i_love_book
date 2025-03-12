@@ -52,6 +52,22 @@ class MainMenuBuilder
             ],
             'display' => $currentRoute !== 'app_contact', 
         ]);
+        $menu->addChild('Connexion', [
+            'route' => 'app_login',
+            'label' => 'Connexion',
+            'attributes' => [
+                'class' => 'menu-item',
+            ],
+            'display' => $currentRoute !== 'app_login', 
+        ]);
+        $menu->addChild('Inscription', [
+            'route' => 'app_register',
+            'label' => 'Inscription',
+            'attributes' => [
+                'class' => 'menu-item',
+            ],
+            'display' => $currentRoute !== 'app_register', 
+        ]);
 
         // $menu->addChild('Profile', [
         //     'route' => 'app_profile',
