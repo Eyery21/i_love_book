@@ -61,7 +61,7 @@ class Book
      * @var Collection<int, Character>
      */
     #[ORM\ManyToMany(targetEntity: Character::class, inversedBy: 'books')]
-    private Collection $characters;
+    private collection $characters;
 
     #[ORM\ManyToOne(targetEntity: Series::class, inversedBy: 'books')]
     #[ORM\JoinColumn(nullable: true)]
