@@ -69,14 +69,14 @@ class MainMenuBuilder
             'display' => $currentRoute !== 'app_register', 
         ]);
 
-        // $menu->addChild('Profile', [
-        //     'route' => 'app_profile',
-        //     'label' => 'Profile',
-        //     'attributes' => [
-        //         'class' => 'menu-item',
-        //     ],
-        //     'display' => $currentRoute !== 'app_profile', // Cache cet élément si on est sur la route "app_profile"
-        // ]);
+        $menu->addChild('Profile', [
+            'route' => 'app_profile_index',
+            'label' => 'Profile',
+            'attributes' => [
+                'class' => 'menu-item',
+            ],
+            'display' => $currentRoute !== 'app_profile_index',
+        ]);
 
         return $menu;
     }
