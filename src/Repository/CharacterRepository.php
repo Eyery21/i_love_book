@@ -16,28 +16,42 @@ class CharacterRepository extends ServiceEntityRepository
         parent::__construct($registry, Character::class);
     }
 
-    //    /**
-    //     * @return Character[] Returns an array of Character objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+       /**
+        * @return Character[] Returns an array of Character objects
+        */
+       public function findByExampleField($value): array
+       {
+           return $this->createQueryBuilder('c')
+               ->andWhere('c.exampleField = :val')
+               ->setParameter('val', $value)
+               ->orderBy('c.id', 'ASC')
+               ->setMaxResults(10)
+               ->getQuery()
+               ->getResult()
+           ;
+       }
+    public function findByVariantName(string $name, int $excludeId = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.name = :name')
+            ->setParameter('name', $name);
 
-    //    public function findOneBySomeField($value): ?Character
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        // Exclure le personnage actuel
+        if ($excludeId) {
+            $qb->andWhere('c.id != :id')
+                ->setParameter('id', $excludeId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+       public function findOneBySomeField($value): ?Character
+       {
+           return $this->createQueryBuilder('c')
+               ->andWhere('c.exampleField = :val')
+               ->setParameter('val', $value)
+               ->getQuery()
+               ->getOneOrNullResult()
+           ;
+       }
 }

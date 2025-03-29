@@ -46,8 +46,10 @@ final class CharacterController extends AbstractController
         ]);
     }
     #[Route('/{id}', name: 'app_character_show', methods: ['GET'])]
-    public function show(Character $character, EntityManagerInterface $entityManager): Response
+    public function show(Character $character, EntityManagerInterface $entityManager, CharacterRepository $characterRepository): Response
     {
+        $variants = $characterRepository->findByVariantName($character->getName(), $character->getId());
+
         // Récupérer les IDs des séries
         $seriesIds = $entityManager->getConnection()->executeQuery(
             'SELECT DISTINCT s.id FROM series s
@@ -77,6 +79,7 @@ final class CharacterController extends AbstractController
             'character' => $character,
             'series' => $series,
             'oneShots' => $oneShots,
+            'variants' => $variants,
         ]);
     }
     
