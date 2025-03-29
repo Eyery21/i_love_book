@@ -8,6 +8,11 @@ use App\Entity\Collections;
 use App\Entity\Comment;
 use App\Entity\Series;
 use App\Entity\User;
+use App\Entity\UserBook;
+use App\Repository\UserBookRepository;
+
+
+
 use App\Form\CommentType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
@@ -88,7 +93,7 @@ final class BookController extends AbstractController
 
 
     #[Route('/{id}/{slug}', name: 'app_book_show', methods: ['GET'])]
-    public function show(Book $book, string $slug, EntityManagerInterface $entityManager): Response
+    public function show(Book $book, string $slug = null, EntityManagerInterface $entityManager, UserBookRepository $userBookRepository): Response
     {
         $correctSlug = $this->getSlug($book->getTitle(), $book->getSubtitle());
         if ($slug !== $correctSlug) {
@@ -114,7 +119,7 @@ final class BookController extends AbstractController
         $comment->setCreatedAt(new \DateTime());
         $comment->setUser($this->getUser());
 
-        
+    
         if ($this->getUser()) {
             $comment->setUser($this->getUser());
         }
@@ -124,12 +129,20 @@ final class BookController extends AbstractController
             'action' => $this->generateUrl('app_book_add_comment',['id' =>$book->getId()])
         ]);
 
+        $userBook = null;
+        if ($this->getUser()) {
+            $userBook = $userBookRepository->findOneBy([
+                'user' => $this->getUser(),
+                'book' => $book
+            ]);
+        }
         $otherBooks = [];
         if ($series) {
             $otherBooks = $entityManager->getRepository(Book::class)->findBy(['series' => $series]);
         }
                 return $this->render('book/show.html.twig', [
             'book' => $book,
+
             'characters' => $characters,
             'series' => $series,
             'otherBooks' => $otherBooks,
@@ -137,6 +150,8 @@ final class BookController extends AbstractController
             'commentForm' => $commentForm->createView(),
             'previousSeries' => $previousSeries,
             'nextSeries' => $nextSeries,
+
+            'userBook' => $userBook
 
         ]);
     }

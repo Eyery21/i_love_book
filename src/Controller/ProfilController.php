@@ -27,6 +27,14 @@ class ProfilController extends AbstractController
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
+        $userBooks = $entityManager->createQueryBuilder()
+            ->select('ub')
+            ->from(UserBook::class, 'ub')
+            ->where('ub.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+
         //recupere les books lus
         $readBooks = $entityManager->createQueryBuilder()
             ->select('b')
@@ -63,6 +71,8 @@ class ProfilController extends AbstractController
         dump($readBooks);
         return $this->render('profile/index.html.twig', [
             'user' => $user,
+            'userBooks' => $userBooks,
+
             'readBooks' => $readBooks,
             'wishlistBooks' => $wishlistBooks,
             'ownedBooks' => $ownedBooks
@@ -114,99 +124,235 @@ class ProfilController extends AbstractController
         ]);
     }
 
-    #[Route('/books/add/{id}', name: 'app_profile_add_book')]
-    public function addBook(Book $book, Request $request, EntityManagerInterface $entityManager): Response
+  
+    #[Route('/books/{id}/own', name: 'app_profile_book_own')]
+    public function ownBook(Book $book, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
-        // Vérifier si l'utilisateur a déjà ajouté ce livre
-        $userBook = $entityManager->getRepository(UserBook::class)->findOneBy([
-            'user' => $user,
-            'book' => $book
-        ]);
-
-        // Traiter les actions
-        $action = $request->query->get('action');
-
-        // Si l'action est remove et que le userBook existe, on le supprime
-        if ($action === 'remove' && $userBook) {
-            // Option 1: Suppression complète de l'entrée UserBook
-            $entityManager->remove($userBook);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Le livre a été retiré de votre liste');
-
-            // Rediriger vers la page de profil au lieu de la page du livre
-            return $this->redirectToRoute('app_profile_index');
-        }
-
-        // Pour les autres actions, continuer comme avant
-        if (!$userBook) {
-            $userBook = new UserBook();
-            $userBook->setUser($user);
-            $userBook->setBook($book);
-            $userBook->setAddedAt(new \DateTime());
-            $userBook->setIsOwned(false);
-            $userBook->setIsWishlist(false);
-            $userBook->setIsRead(false);
-        }
-
-        if ($action === 'own') {
-            $userBook->setIsOwned(true);
-        } elseif ($action === 'wishlist') {
-            $userBook->setIsWishlist(true);
-        } elseif ($action === 'read') {
-            $userBook->setIsRead(true);
-        } elseif ($action === 'toggle_wishlist') {
-            // Option alternative: basculer l'état isWishlist
-            $userBook->setIsWishlist(!$userBook->isWishlist());
-        }
+        $userBook = $this->getUserBook($book, $entityManager);
+        $userBook->setIsOwned(true);
 
         $entityManager->persist($userBook);
         $entityManager->flush();
 
-        // Récupérer la page précédente (referer) pour y retourner après l'action
-        $referer = $request->headers->get('referer');
+        $this->addFlash('success', 'Le livre a été ajouté à votre collection');
 
-        // Si le referer existe, y retourner, sinon aller à la page du livre
-        if ($referer) {
-            return $this->redirect($referer);
-        } else {
-            return $this->redirectToRoute('app_book_show', ['id' => $book->getId(), 'slug' => $book->getTitle()]);
-        }
+        return $this->getRedirectResponse($request, 'app_book_show', ['id' => $book->getId()]);
     }
-    #[Route('/books/{id}', name: 'app_profile_manage_book')]
-    public function manageBook(Book $book, Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/books/{id}/unown', name: 'app_profile_book_unown')]
+    public function unownBook(Book $book, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
-        // Récupérer l'action demandée
-        $action = $request->query->get('action', 'view');
+        $userBook = $this->getUserBook($book, $entityManager, false);
 
-        // Vérifier si l'utilisateur a déjà une relation avec ce livre
-        $userBook = $entityManager->getRepository(UserBook::class)->findOneBy([
-            'user' => $user,
-            'book' => $book
-        ]);
+        if ($userBook) {
+            $userBook->setIsOwned(false);
 
-        // Actions nécessitant la suppression de l'entrée
-        if ($action === 'remove' && $userBook) {
-            $entityManager->remove($userBook);
+            // Si aucune autre propriété n'est activée, supprimer l'entrée
+            if (!$userBook->isRead() && !$userBook->isWishlist() && !$userBook->getRating() && !$userBook->getPersonnalNotes()) {
+                $entityManager->remove($userBook);
+            } else {
+                $entityManager->persist($userBook);
+            }
+
             $entityManager->flush();
             $this->addFlash('success', 'Le livre a été retiré de votre collection');
-
-            // Rediriger vers la page d'où vient la requête ou la page de profil
-            return $this->getRedirectResponse($request, 'app_profile_index');
         }
 
-        // Créer une nouvelle entrée si elle n'existe pas
-        if (!$userBook) {
+        return $this->getRedirectResponse($request, 'app_book_show', ['id' => $book->getId()]);
+    }
+    #[Route('/books/{id}/wishlist', name: 'app_profile_book_wishlist')]
+    public function wishlistBook(Book $book, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $userBook = $this->getUserBook($book, $entityManager);
+        $userBook->setIsWishlist(true);
+
+        $entityManager->persist($userBook);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Le livre a été ajouté à votre liste de souhaits');
+
+        return $this->getRedirectResponse($request, 'app_book_show', ['id' => $book->getId()]);
+    }
+
+    #[Route('/books/{id}/unwishlist', name: 'app_profile_book_unwishlist')]
+    public function unwishlistBook(Book $book, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $userBook = $this->getUserBook($book, $entityManager, false);
+
+        if ($userBook) {
+            $userBook->setIsWishlist(false);
+
+            // Si aucune autre propriété n'est activée, supprimer l'entrée
+            if (!$userBook->isRead() && !$userBook->isOwned() && !$userBook->getRating() && !$userBook->getPersonnalNotes()) {
+                $entityManager->remove($userBook);
+            } else {
+                $entityManager->persist($userBook);
+            }
+
+            $entityManager->flush();
+            $this->addFlash('success', 'Le livre a été retiré de votre liste de souhaits');
+        }
+
+        return $this->getRedirectResponse($request, 'app_book_show', ['id' => $book->getId()]);
+    }
+
+    #[Route('/books/{id}/read', name: 'app_profile_book_read')]
+    public function readBook(Book $book, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $userBook = $this->getUserBook($book, $entityManager);
+        $userBook->setIsRead(true);
+
+        $entityManager->persist($userBook);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Le livre a été marqué comme lu');
+
+        return $this->getRedirectResponse($request, 'app_book_show', ['id' => $book->getId()]);
+    }
+
+    #[Route('/books/{id}/unread', name: 'app_profile_book_unread')]
+    public function unreadBook(Book $book, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $userBook = $this->getUserBook($book, $entityManager, false);
+
+        if ($userBook) {
+            $userBook->setIsRead(false);
+
+            // Si aucune autre propriété n'est activée, supprimer l'entrée
+            if (!$userBook->isOwned() && !$userBook->isWishlist() && !$userBook->getRating() && !$userBook->getPersonnalNotes()) {
+                $entityManager->remove($userBook);
+            } else {
+                $entityManager->persist($userBook);
+            }
+
+            $entityManager->flush();
+            $this->addFlash('success', 'Le livre a été marqué comme non lu');
+        }
+
+        return $this->getRedirectResponse($request, 'app_book_show', ['id' => $book->getId()]);
+    }
+    #[Route('/books/{id}/rate/{rating}', name: 'app_profile_book_rate', requirements: ['rating' => '[1-5]'])]
+    public function rateBook(Book $book, int $rating, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $userBook = $this->getUserBook($book, $entityManager);
+
+        // Convertir la notation en système de préférence
+        switch ($rating) {
+            case 5: // J'aime (5 étoiles)
+                $userBook->setRating(5);
+                $message = 'Vous avez ajouté ce livre à vos favoris';
+                break;
+            case 1: // Je n'aime pas (1 étoile)
+                $userBook->setRating(1);
+                $message = 'Vous avez indiqué que vous n\'aimez pas ce livre';
+                break;
+            case 3: // Sans avis (3 étoiles, neutre)
+                $userBook->setRating(null); // ou 0, selon votre modèle de données
+                $message = 'Vous avez retiré votre avis sur ce livre';
+                break;
+            default:
+                $userBook->setRating($rating);
+                $message = 'Votre avis a été enregistré';
+        }
+
+        $entityManager->persist($userBook);
+        $entityManager->flush();
+
+        $this->addFlash('success', $message);
+
+        return $this->getRedirectResponse($request, 'app_book_show', ['id' => $book->getId()]);
+    }
+
+    #[Route('/books/{id}/remove', name: 'app_profile_book_remove')]
+    public function removeBook(Book $book, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $userBook = $entityManager->getRepository(UserBook::class)->findOneBy([
+            'user' => $user,
+            'book' => $book
+        ]);
+
+        if ($userBook) {
+            $entityManager->remove($userBook);
+            $entityManager->flush();
+            $this->addFlash('success', 'Le livre a été complètement retiré de votre profil');
+        }
+
+        return $this->getRedirectResponse($request, 'app_profile_index');
+    }
+    #[Route('/books/{id}/notes', name: 'app_profile_book_notes', methods: ['POST'])]
+    public function editNotes(Book $book, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $userBook = $this->getUserBook($book, $entityManager);
+        $notes = $request->request->get('notes');
+
+        if ($notes !== null) {
+            $userBook->setPersonnalNotes($notes);
+            $entityManager->persist($userBook);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Vos notes personnelles ont été enregistrées');
+        }
+
+        return $this->getRedirectResponse($request, 'app_book_show', ['id' => $book->getId()]);
+    }
+
+    /**
+     * Récupère ou crée un objet UserBook pour l'utilisateur courant et le livre spécifié
+     */
+    private function getUserBook(Book $book, EntityManagerInterface $entityManager, bool $createIfNotExist = true): ?UserBook
+    {
+        $user = $this->getUser();
+        
+        $userBook = $entityManager->getRepository(UserBook::class)->findOneBy([
+            'user' => $user,
+            'book' => $book
+        ]);
+        
+        if (!$userBook && $createIfNotExist) {
             $userBook = new UserBook();
             $userBook->setUser($user);
             $userBook->setBook($book);
@@ -215,77 +361,9 @@ class ProfilController extends AbstractController
             $userBook->setIsWishlist(false);
             $userBook->setIsRead(false);
         }
-
-        // Tableau des messages flash pour chaque action
-        $flashMessages = [
-            'own' => 'Le livre a été ajouté à votre collection',
-            'un_own' => 'Le livre a été retiré de votre collection',
-            'wishlist' => 'Le livre a été ajouté à votre liste de souhaits',
-            'un_wishlist' => 'Le livre a été retiré de votre liste de souhaits',
-            'read' => 'Le livre a été marqué comme lu',
-            'un_read' => 'Le livre a été marqué comme non lu',
-            'rate' => 'Votre note a été enregistrée'
-        ];
-
-        // Traiter les différentes actions
-        switch ($action) {
-            case 'own':
-                $userBook->setIsOwned(true);
-                break;
-            case 'un_own':
-                $userBook->setIsOwned(false);
-                break;
-            case 'wishlist':
-                $userBook->setIsWishlist(true);
-                break;
-            case 'un_wishlist':
-                $userBook->setIsWishlist(false);
-                break;
-            case 'read':
-                $userBook->setIsRead(true);
-                break;
-            case 'un_read':
-                $userBook->setIsRead(false);
-                break;
-            case 'toggle_own':
-                $userBook->setIsOwned(!$userBook->isOwned());
-                $action = $userBook->isOwned() ? 'own' : 'un_own';
-                break;
-            case 'toggle_wishlist':
-                $userBook->setIsWishlist(!$userBook->isWishlist());
-                $action = $userBook->isWishlist() ? 'wishlist' : 'un_wishlist';
-                break;
-            case 'toggle_read':
-                $userBook->setIsRead(!$userBook->isRead());
-                $action = $userBook->isRead() ? 'read' : 'un_read';
-                break;
-            case 'rate':
-                $rating = $request->query->getInt('rating', 0);
-                if ($rating >= 1 && $rating <= 5) {
-                    $userBook->setRating($rating);
-                }
-                break;
-            case 'notes':
-                $notes = $request->request->get('notes');
-                if ($notes !== null) {
-                    $userBook->setPersonnalNotes($notes);
-                }
-                break;
-        }
-
-        // Persister les changements
-        $entityManager->persist($userBook);
-        $entityManager->flush();
-
-        // Ajouter un message flash si disponible pour cette action
-        if (isset($flashMessages[$action])) {
-            $this->addFlash('success', $flashMessages[$action]);
-        }
-
-        // Rediriger vers la page appropriée
-        return $this->getRedirectResponse($request, 'app_book_show', ['id' => $book->getId(), 'slug' => $book->getTitle()]);
+        
+        return $userBook;
     }
-
     /**
      * Génère une réponse de redirection basée sur le referer ou une route par défaut
      */

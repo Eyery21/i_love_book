@@ -3,7 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Book;
-use App\Form\BookCategory; 
+use App\Form\BookCategory;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -36,12 +36,23 @@ class BookCrudController extends AbstractCrudController
             TextEditorField::new('description', 'Description'),
             TextField::new('parution', 'Date de parution'),
             BooleanField::new('posseded', 'Possédé'),
+
             ImageField::new('image', 'Aperçu de l’image')
                 ->setBasePath('/uploads/images')
                 ->onlyOnIndex(),
             TextField::new('imageFile', 'Télécharger une image')
                 ->setFormType(VichImageType::class)
                 ->onlyOnForms(),
+
+            // 
+            ImageField::new('coverImage', 'Aperçu de l’image')
+                ->setBasePath('/uploads/images')
+                ->onlyOnIndex(),
+            TextField::new('coverImageFile', 'Télécharger une image')
+                ->setFormType(VichImageType::class)
+                ->onlyOnForms(),
+
+
             TextField::new('author', 'Auteur'),
             TextField::new('illustrator', 'Illustrateur'),
             MoneyField::new('price', 'Prix')
@@ -51,22 +62,22 @@ class BookCrudController extends AbstractCrudController
             DateTimeField::new('updatedAt', 'Dernière mise à jour')
                 ->hideOnForm(),
             AssociationField::new('collection')
-            ->setCrudController(CollectionsCrudController::class)
-            ->setLabel('Collection')
-            ->formatValue(fn($value, $entity) => $entity->getCollection() ? $entity->getCollection()->getName() : 'Aucune collection')
+                ->setCrudController(CollectionsCrudController::class)
+                ->setLabel('Collection')
+                ->formatValue(fn($value, $entity) => $entity->getCollection() ? $entity->getCollection()->getName() : 'Aucune collection')
 
-            ->setFormTypeOption('choice_label', 'name') // Affiche le nom de la collection
-            ->setRequired(true), // Rend le champ obligatoire
+                ->setFormTypeOption('choice_label', 'name') // Affiche le nom de la collection
+                ->setRequired(true), // Rend le champ obligatoire
 
             AssociationField::new('series', 'Series')
-            ->setCrudController(SeriesCrudController::class)
-            ->formatValue(fn($value, $entity) => $entity->getSeries() ? $entity->getSeries()->getTitle() : 'Aucune collection')
+                ->setCrudController(SeriesCrudController::class)
+                ->formatValue(fn($value, $entity) => $entity->getSeries() ? $entity->getSeries()->getTitle() : 'Aucune collection')
 
-            ->setFormTypeOption('choice_label', 'title'), // Utilise le titre pour l'affichage
+                ->setFormTypeOption('choice_label', 'title'), // Utilise le titre pour l'affichage
 
             AssociationField::new('characters', 'Characters')
-            ->setCrudController(CharacterCrudController::class)
-            ->setFormTypeOption('choice_label', 'name')
+                ->setCrudController(CharacterCrudController::class)
+                ->setFormTypeOption('choice_label', 'name')
 
         ];
     }

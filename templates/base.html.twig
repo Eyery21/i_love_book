@@ -12,9 +12,8 @@
 </head>
 <body>
     {{ knp_menu_render('main_menu') }}
-    {% if characters is defined %}
-        {{ include('character/partial.html.twig', { characters: characters }) }}
-    {% endif %}    {% block body %}{% endblock %}
+    
+      {% block body %}{% endblock %}
 
 
       

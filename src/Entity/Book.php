@@ -85,6 +85,13 @@ class Book
     #[ORM\OneToMany(targetEntity: UserBook::class, mappedBy: 'book')]
     private Collection $userBooks;
 
+
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $coverImage = null;
+    #[Vich\UploadableField(mapping: 'book_images', fileNameProperty: 'coverImage')]
+    private ?File $coverImageFile = null;
+
     public function __construct()
     {
         $this->characters = new ArrayCollection();
@@ -380,6 +387,34 @@ class Book
             if ($userBook->getBook() === $this) {
                 $userBook->setBook(null);
             }
+        }
+
+        return $this;
+    }
+
+    public function getCoverImage(): ?string
+    {
+        return $this->coverImage;
+    }
+
+    public function setCoverImage(?string $coverImage): self
+    {
+        $this->coverImage = $coverImage;
+        return $this;
+    }
+
+    public function getCoverImageFile(): ?File
+    {
+        return $this->coverImageFile;
+    }
+
+    public function setCoverImageFile(?File $coverImageFile = null): self
+    {
+        $this->coverImageFile = $coverImageFile;
+
+        if (null !== $coverImageFile) {
+            // Mettre à jour la date de modification pour déclencher l'enregistrement
+            $this->updatedAt = new \DateTimeImmutable();
         }
 
         return $this;
